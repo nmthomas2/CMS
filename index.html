@@ -1,3 +1,196 @@
 <html>
-<title>CMS PROJECT</title>
+<title>
+
+</title>
+<head>
+
+</head>
+<style>
+    .box {
+        height: 100px;
+        width: 100px;
+        background-color: black;
+        position: relative;
+        top: 5px;
+        left: 5px;
+        cursor: pointer;
+        /*display:flex;*/
+        justify-content: center;
+        align-items: center;
+    }
+    .resizehandle {
+        background-color: #727272;
+        width: 10px;
+        height: 10px;
+        cursor: se-resize;
+        position:absolute;
+        right: 0;
+        bottom: 0;
+    }
+    .held {
+        border: solid 10px black;
+        background-color: black;
+    }
+
+    .holder {
+        height: 220px;
+        width: 110px;
+        margin: 10px;
+        border: solid 5px black;
+        background-color: white;
+        display: inline-block;
+    }
+
+    .hovered {
+        border: dotted 5px black;
+    }
+
+    .invisible {
+        display: none;
+    }
+
+    #container {
+        margin: auto;
+        top: 100px;
+        width: 400px;
+        position: relative;
+    }
+</style>
+<script>
+    class move {
+
+        static init() {
+
+            move.box = document.getElementsByClassName('box')[0]
+
+            move.box.addEventListener("dragstart", move.dragstart)
+            move.box.addEventListener("dragend", move.dragend)
+
+            const containers = document.getElementsByClassName('holder')
+
+            for(const container of containers) {
+                container.addEventListener("dragover", move.dragover)
+                container.addEventListener("dragenter", move.dragenter)
+                container.addEventListener("dragleave", move.dragleave)
+                container.addEventListener("drop", move.drop)
+            }
+        }
+
+        static dragstart() {
+            this.className += " held"
+
+            setTimeout(()=>this.className="invisible", 0)
+        }
+
+        static dragend() {
+            this.className = "box"
+        }
+
+        static dragover(e) {
+            e.preventDefault()
+        }
+
+        static dragenter(e) {
+            e.preventDefault()
+            this.className += " hovered"
+        }
+
+        static dragleave() {
+            this.className = "holder"
+        }
+
+        static drop() {
+            this.className = "holder"
+            this.append(move.box)
+        }
+
+    }
+    function setDrag(){
+        var boxes = document.getElementsByClassName('box');
+        var containers = document.getElementsByClassName('holder');
+        for(var i=0; i<boxes.length; i++){
+            var box = boxes[i];
+            (function(box){
+                box.setAttribute("draggable",true);
+                box.addEventListener("dragstart", dragstart);
+                box.addEventListener("dragend", dragend);
+                for(container of containers){
+                    container.addEventListener("dragover", dragover);
+                    container.addEventListener("dragenter", dragenter);
+                    container.addEventListener("dragleave", dragleave);
+                    container.addEventListener("drop", drop);
+                }
+                function dragstart(){
+                    this.className += "held";
+                    setTimeout(()=>this.className="invisible", 0);
+                    console.log("dragstart");
+                }
+                function dragend(){
+                    this.className="box";
+                }
+                function dragover(e){
+                    e.preventDefault();
+                }
+                function dragenter(e){
+                    e.preventDefault();
+                    this.className += "hovered";
+                }
+                function dragleave(){
+                    this.className = "holder";
+                }
+                function drop(){
+                    this.className = "holder";
+                    this.append(box);
+                }
+            }(box));
+        }
+    }
+    function setResize(){
+        var handles = document.getElementsByClassName("resizehandle");
+        for(var i=0;i<handles.length;i++){
+            var handle = handles[i];
+            (function(handle){
+                handle.addEventListener('mousedown', initialiseResize);
+                function initialiseResize(e) {
+                    window.addEventListener('mousemove', startResizing);
+                    window.addEventListener('mouseup', stopResizing);
+                }
+                function startResizing(e) {
+                    const rect = handle.parentElement.getBoundingClientRect();
+                    handle.parentElement.style.width = (e.clientX - rect.left) + 'px';
+                    handle.parentElement.style.height = (e.clientY - rect.top) + 'px';
+                }
+                function stopResizing(e) {
+                    window.removeEventListener('mousemove', startResizing);
+                    window.removeEventListener('mouseup', stopResizing);
+                }
+            }(handle));
+        }
+    }
+    document.addEventListener("DOMContentLoaded", function(){
+        setResize();
+        // setDrag();
+        move.init();
+    });
+</script>
+
+<body>
+
+<div id="container">
+    <div class="holder">
+        <div class="box">
+            <div class="resizehandle">
+            </div>
+        </div>
+    </div>
+
+    <div class="holder">
+        <div class="box">
+            <div class="resizehandle">
+            </div>
+        </div>
+
+    </div>
+</div>
+</body>
 </html>
